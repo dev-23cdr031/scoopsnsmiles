@@ -67,8 +67,9 @@
 ## Technical Implementation
 - Built with Next.js 16 App Router
 - Client and server components optimization
+- Frontend code organized under `frontend/`
 - Dedicated backend service in `backend/` using Express
-- Frontend API client in `lib/api/client.ts` for all data/actions
+- Frontend API client in `frontend/lib/api/client.ts` for all data/actions
 - Responsive design for all screen sizes
 - Smooth hover effects and transitions
 - Interactive form validation

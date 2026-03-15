@@ -1,14 +1,14 @@
 # Project Structure
 
-## Frontend (`/`)
+## Frontend (`/frontend`)
 
-- `app/`: Next.js App Router pages and layouts.
-- `components/`: Reusable UI and feature components.
-- `context/`: React context providers (cart state).
-- `hooks/`: Shared custom hooks.
-- `lib/api/client.ts`: Frontend HTTP client for backend APIs.
-- `lib/types.ts`: Shared frontend TypeScript domain types.
-- `public/`: Static assets.
+- `frontend/app/`: Next.js App Router pages and layouts.
+- `frontend/components/`: Reusable UI and feature components.
+- `frontend/context/`: React context providers (cart state).
+- `frontend/hooks/`: Shared custom hooks.
+- `frontend/lib/api/client.ts`: Frontend HTTP client for backend APIs.
+- `frontend/lib/types.ts`: Shared frontend TypeScript domain types.
+- `frontend/public/`: Static assets.
 
 ## Backend (`/backend`)
 
