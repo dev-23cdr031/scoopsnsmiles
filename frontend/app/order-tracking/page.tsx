@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { Search, Package, Truck, CheckCircle, Clock, ChefHat, MapPin, Phone, ArrowRight } from 'lucide-react';
-import { trackOrder } from '@/lib/api/client';
+import { getRecentOrders, trackOrder } from '@/lib/api/client';
 import type { OrderResult, OrderStatus } from '@/lib/types';
 
 const statusSteps: { key: OrderStatus; label: string; icon: React.ReactNode }[] = [
@@ -17,25 +18,67 @@ const statusSteps: { key: OrderStatus; label: string; icon: React.ReactNode }[] 
 ];
 
 export default function OrderTrackingPage() {
+  const searchParams = useSearchParams();
+  const autoLoadedOrder = useRef<string | null>(null);
   const [orderId, setOrderId] = useState('');
   const [order, setOrder] = useState<OrderResult | null>(null);
+  const [recentOrders, setRecentOrders] = useState<OrderResult[]>([]);
+  const [loadingRecentOrders, setLoadingRecentOrders] = useState(true);
   const [error, setError] = useState('');
   const [searching, setSearching] = useState(false);
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const loadRecentOrders = async () => {
+    setLoadingRecentOrders(true);
+    const items = await getRecentOrders(24);
+    setRecentOrders(items);
+    setLoadingRecentOrders(false);
+  };
+
+  const searchByOrderId = async (value: string) => {
+    const normalized = value.trim();
+    if (!normalized) {
+      setError('Please enter an order ID.');
+      setOrder(null);
+      return;
+    }
+
     setError('');
     setOrder(null);
     setSearching(true);
 
-    const found = await trackOrder(orderId.trim());
+    const found = await trackOrder(normalized);
     if (found) {
       setOrder(found);
     } else {
       setError('Order not found. Please check your order ID and try again.');
     }
+
     setSearching(false);
   };
+
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await searchByOrderId(orderId);
+  };
+
+  useEffect(() => {
+    void loadRecentOrders();
+  }, []);
+
+  useEffect(() => {
+    const initialOrderId = searchParams.get('orderId')?.trim() || '';
+    if (!initialOrderId) {
+      return;
+    }
+
+    if (autoLoadedOrder.current === initialOrderId) {
+      return;
+    }
+
+    autoLoadedOrder.current = initialOrderId;
+    setOrderId(initialOrderId);
+    void searchByOrderId(initialOrderId);
+  }, [searchParams]);
 
   const getStepStatus = (stepKey: OrderStatus) => {
     if (!order) return 'pending';
@@ -64,7 +107,7 @@ export default function OrderTrackingPage() {
             Track Your Order
           </h1>
           <p className="text-lg text-foreground/60 max-w-2xl mx-auto mb-8">
-            Enter your order ID to see real-time updates on your fresh bakes.
+            Pick from recent orders or enter an order ID to see real-time updates on your fresh bakes.
           </p>
 
           {/* Search Form */}
@@ -101,12 +144,71 @@ export default function OrderTrackingPage() {
         </div>
       </section>
 
+      {/* Recent Orders */}
+      <section className="bg-background py-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-5 flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-2xl font-bold text-foreground">Recent Orders and Products</h2>
+              <p className="text-sm text-foreground/60">Select any order below to track instantly. No manual order ID needed.</p>
+            </div>
+            <button
+              onClick={() => void loadRecentOrders()}
+              className="rounded-full border border-border px-4 py-2 text-sm font-semibold text-foreground hover:bg-muted"
+            >
+              Refresh List
+            </button>
+          </div>
+
+          {loadingRecentOrders ? (
+            <div className="rounded-2xl border border-border/50 bg-card p-6 text-foreground/70">
+              Loading recent orders...
+            </div>
+          ) : recentOrders.length === 0 ? (
+            <div className="rounded-2xl border border-border/50 bg-card p-6 text-foreground/70">
+              No orders available yet. Place a new order to see it here.
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {recentOrders.map((recent) => (
+                <article key={recent.orderId} className="rounded-2xl border border-border/50 bg-card p-4 shadow-sm">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-sm font-bold text-foreground">{recent.orderId}</p>
+                    <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold capitalize text-primary">
+                      {recent.status.replaceAll('-', ' ')}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs text-foreground/60">{recent.customerName} | ₹{recent.totalAmount.toLocaleString('en-IN')}</p>
+
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {recent.items.map((item, index) => (
+                      <span key={`${recent.orderId}_${index}`} className="rounded-md bg-muted px-2 py-1 text-xs text-foreground/80">
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setOrderId(recent.orderId);
+                      void searchByOrderId(recent.orderId);
+                    }}
+                    className="mt-4 w-full rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+                  >
+                    Track This Order
+                  </button>
+                </article>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* Error */}
       {error && (
         <section className="bg-background py-12">
           <div className="max-w-lg mx-auto px-4 text-center">
             <div className="bg-red-50 border border-red-200 rounded-2xl p-8">
-              <div className="text-4xl mb-3">😕</div>
               <p className="text-red-700 font-semibold mb-2">{error}</p>
               <p className="text-red-600/70 text-sm">Double-check the ID or contact us for help.</p>
             </div>
@@ -224,8 +326,8 @@ export default function OrderTrackingPage() {
                 <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4 text-primary">
                   <Search className="w-7 h-7" />
                 </div>
-                <h3 className="font-bold text-foreground mb-2">Enter Your ID</h3>
-                <p className="text-sm text-foreground/60">Paste your order ID above to see real-time status of your bakes.</p>
+                <h3 className="font-bold text-foreground mb-2">Select or Search</h3>
+                <p className="text-sm text-foreground/60">Use the recent orders list, or paste your order ID above if you already have it.</p>
               </div>
               <div className="text-center p-6 bg-card rounded-2xl border border-border/50">
                 <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4 text-primary">

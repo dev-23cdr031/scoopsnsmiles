@@ -2,7 +2,8 @@
   "name": "scoopsnsmiles-workspace",
   "private": true,
   "scripts": {
-    "dev": "pnpm dev:frontend",
+    "dev": "node scripts/dev-all.js",
+    "stop:dev": "powershell -ExecutionPolicy Bypass -File scripts/stop-dev.ps1",
     "dev:frontend": "pnpm --dir frontend dev",
     "dev:backend": "pnpm --dir backend dev",
     "build": "pnpm --dir frontend build",

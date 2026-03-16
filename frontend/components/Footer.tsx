@@ -35,6 +35,7 @@ export default function Footer() {
               <li><Link href="/faq" className="hover:opacity-80 transition-opacity">FAQ</Link></li>
               <li><Link href="/loyalty" className="hover:opacity-80 transition-opacity">Loyalty Rewards</Link></li>
               <li><Link href="/order-tracking" className="hover:opacity-80 transition-opacity">Track Order</Link></li>
+              <li><Link href="/admin" className="hover:opacity-80 transition-opacity">Admin Analytics</Link></li>
             </ul>
           </div>
 
@@ -66,6 +67,8 @@ export default function Footer() {
           <div className="flex flex-col md:flex-row justify-between items-center text-sm opacity-80">
             <p>&copy; {new Date().getFullYear()} Sakthi Bakers. All rights reserved.</p>
             <div className="flex gap-6 mt-4 md:mt-0">
+              <Link href="/order-tracking" className="hover:opacity-80 transition-opacity">Track Order</Link>
+              <Link href="/admin" className="hover:opacity-80 transition-opacity">Admin Analytics</Link>
               <Link href="#" className="hover:opacity-80 transition-opacity">Privacy</Link>
               <Link href="#" className="hover:opacity-80 transition-opacity">Terms</Link>
               <Link href="#" className="hover:opacity-80 transition-opacity">Cookies</Link>

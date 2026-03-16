@@ -1,5 +1,6 @@
 import cors from "cors";
 import express from "express";
+import adminRoutes from "./routes/admin.js";
 import catalogRoutes from "./routes/catalog.js";
 import engagementRoutes from "./routes/engagement.js";
 
@@ -23,7 +24,8 @@ app.get("/", (_req, res) => {
       products: "/api/products",
       offers: "/api/offers",
       giftCards: "/api/gift-cards",
-      orderTrackingExample: "/api/orders/SB-2026-0001"
+      orderTrackingExample: "/api/orders/SB-2026-0001",
+      adminMlInsights: "/api/admin/ml/insights"
     }
   });
 });
@@ -34,6 +36,7 @@ app.get("/api/health", (_req, res) => {
 
 app.use("/api", catalogRoutes);
 app.use("/api", engagementRoutes);
+app.use("/api", adminRoutes);
 
 app.use((req, res) => {
   res.status(404).json({

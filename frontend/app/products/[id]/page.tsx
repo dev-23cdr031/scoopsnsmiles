@@ -6,8 +6,9 @@ import { getProductById, getProducts } from '@/lib/api/client';
 
 export const dynamic = 'force-dynamic';
 
-export default async function ProductDetail({ params }: { params: { id: string } }) {
-  const productId = Number(params.id);
+export default async function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const productId = Number(id);
   const product = Number.isNaN(productId) ? null : await getProductById(productId);
 
   if (!product) {

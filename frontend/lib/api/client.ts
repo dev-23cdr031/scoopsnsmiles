@@ -1,7 +1,13 @@
 import type {
+  AdminCreateProductPayload,
+  AdminCreateProductResponse,
+  AdminMlInsights,
+  AdminUpdateOrderStatusResponse,
   Category,
   ContactPayload,
   ContactResponse,
+  CreateOrderPayload,
+  CreateOrderResponse,
   GiftCard,
   NewsletterResponse,
   OrderResult,
@@ -17,6 +23,12 @@ type ProductQuery = {
   search?: string;
   sort?: "default" | "price-low" | "price-high" | "name";
   limit?: number;
+};
+
+type AdminMlQuery = {
+  days?: number;
+  limit?: number;
+  refresh?: boolean;
 };
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
@@ -92,6 +104,21 @@ export async function trackOrder(orderId: string): Promise<OrderResult | null> {
   return safeRequest<OrderResult | null>(`/api/orders/${encodeURIComponent(orderId)}`, null);
 }
 
+export async function getRecentOrders(limit = 20): Promise<OrderResult[]> {
+  return safeRequest<OrderResult[]>("/api/orders", [], undefined, { limit });
+}
+
+export async function createOrder(payload: CreateOrderPayload): Promise<CreateOrderResponse | null> {
+  return safeRequest<CreateOrderResponse | null>(
+    "/api/orders",
+    null,
+    {
+      method: "POST",
+      body: JSON.stringify(payload)
+    }
+  );
+}
+
 export async function subscribeNewsletter(email: string): Promise<NewsletterResponse | null> {
   return safeRequest<NewsletterResponse | null>(
     "/api/newsletter",
@@ -106,6 +133,41 @@ export async function subscribeNewsletter(email: string): Promise<NewsletterResp
 export async function submitContact(payload: ContactPayload): Promise<ContactResponse | null> {
   return safeRequest<ContactResponse | null>(
     "/api/contact",
+    null,
+    {
+      method: "POST",
+      body: JSON.stringify(payload)
+    }
+  );
+}
+
+export async function getAdminMlInsights(query?: AdminMlQuery): Promise<AdminMlInsights | null> {
+  return safeRequest<AdminMlInsights | null>("/api/admin/ml/insights", null, undefined, query);
+}
+
+export async function getAdminOrders(): Promise<OrderResult[]> {
+  return safeRequest<OrderResult[]>("/api/admin/orders", []);
+}
+
+export async function updateAdminOrderStatus(
+  orderId: string,
+  status: string
+): Promise<AdminUpdateOrderStatusResponse | null> {
+  return safeRequest<AdminUpdateOrderStatusResponse | null>(
+    `/api/admin/orders/${encodeURIComponent(orderId)}/status`,
+    null,
+    {
+      method: "PATCH",
+      body: JSON.stringify({ status })
+    }
+  );
+}
+
+export async function createAdminProduct(
+  payload: AdminCreateProductPayload
+): Promise<AdminCreateProductResponse | null> {
+  return safeRequest<AdminCreateProductResponse | null>(
+    "/api/admin/products",
     null,
     {
       method: "POST",

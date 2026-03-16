@@ -2,8 +2,9 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, X, Search, Phone, ShoppingCart, ChevronDown } from 'lucide-react';
+import { Menu, X, Search, Phone, ShoppingCart, ChevronDown, User, LogOut } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/context/AuthContext';
 
 const mainLinks = [
   { href: '/products', label: 'Products' },
@@ -19,12 +20,14 @@ const moreLinks = [
   { href: '/loyalty', label: 'Loyalty Rewards' },
   { href: '/faq', label: 'FAQ' },
   { href: '/order-tracking', label: 'Order Tracking' },
+  { href: '/admin', label: 'Admin Analytics' },
 ];
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const { totalCount, setIsOpen: setCartOpen } = useCart();
+  const { user, isAuthenticated, isHydrated, signOut } = useAuth();
   const moreRef = useRef<HTMLDivElement>(null);
 
   const toggleMenu = () => {
@@ -107,6 +110,36 @@ export default function Header() {
                 </span>
               )}
             </button>
+            {isHydrated && isAuthenticated ? (
+              <>
+                <div className="inline-flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm text-foreground/80">
+                  <User className="w-4 h-4 text-primary" />
+                  <span>{user?.name || user?.email}</span>
+                </div>
+                <button
+                  onClick={signOut}
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-border text-sm font-semibold text-foreground hover:bg-muted transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/signin"
+                  className="px-3 py-2 rounded-lg border border-border text-sm font-semibold text-foreground hover:bg-muted transition-colors"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/signup"
+                  className="px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity"
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
             <button className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity font-semibold text-sm">
               <Phone className="w-4 h-4" />
               Call Us
@@ -149,6 +182,41 @@ export default function Header() {
                 {link.label}
               </Link>
             ))}
+            {isHydrated && isAuthenticated ? (
+              <>
+                <div className="mx-1 mt-2 flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm text-foreground/80">
+                  <User className="w-4 h-4 text-primary" />
+                  <span>{user?.name || user?.email}</span>
+                </div>
+                <button
+                  onClick={() => {
+                    signOut();
+                    setIsOpen(false);
+                  }}
+                  className="w-full mt-2 px-4 py-2 border border-border rounded-lg text-foreground transition-colors flex items-center justify-center gap-2 hover:bg-muted"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                <Link
+                  href="/signin"
+                  className="px-4 py-2 border border-border rounded-lg text-foreground text-center font-semibold"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/signup"
+                  className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-center font-semibold"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Sign Up
+                </Link>
+              </div>
+            )}
             <button className="w-full mt-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
               <Phone className="w-4 h-4" />
               Call Us

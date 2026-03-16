@@ -1,10 +1,14 @@
 'use client';
 
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { X, Trash2, Plus, Minus, ShoppingBag } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/context/AuthContext';
 
 export default function CartDrawer() {
+  const router = useRouter();
+  const { isAuthenticated } = useAuth();
   const { items, isOpen, setIsOpen, removeItem, updateQty, totalPrice, totalCount, clearCart } = useCart();
 
   if (!isOpen) return null;
@@ -98,8 +102,19 @@ export default function CartDrawer() {
               <span className="text-foreground font-semibold">Total</span>
               <span className="text-2xl font-bold text-primary">₹{totalPrice.toLocaleString('en-IN')}</span>
             </div>
-            <button className="w-full py-3 bg-primary text-primary-foreground rounded-lg font-bold hover:opacity-90 transition-opacity">
-              Place Order via WhatsApp
+            <button
+              onClick={() => {
+                setIsOpen(false);
+                if (!isAuthenticated) {
+                  router.push('/signin?returnTo=%2Fcheckout');
+                  return;
+                }
+
+                router.push('/checkout');
+              }}
+              className="w-full py-3 bg-primary text-primary-foreground rounded-lg font-bold hover:opacity-90 transition-opacity"
+            >
+              {isAuthenticated ? 'Proceed to Checkout' : 'Sign In to Checkout'}
             </button>
             <button
               onClick={clearCart}
