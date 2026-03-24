@@ -2,10 +2,10 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, Suspense, useMemo, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 
-export default function SignUpPage() {
+function SignUpContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { signUp, isHydrated, isAuthenticated } = useAuth();
@@ -99,5 +99,13 @@ export default function SignUpPage() {
         </p>
       </div>
     </main>
+  );
+}
+
+export default function SignUpPage() {
+  return (
+    <Suspense fallback={<main className="min-h-screen bg-background py-12" />}>
+      <SignUpContent />
+    </Suspense>
   );
 }

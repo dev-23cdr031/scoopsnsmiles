@@ -1,20 +1,14 @@
-# Use Node.js image
-FROM node:18
+FROM node:20-alpine
 
-# Create app directory
 WORKDIR /app
 
-# Copy package.json
-COPY package*.json ./
+RUN corepack enable
 
-# Install dependencies
-RUN npm install
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile --prod
 
-# Copy project files
-COPY . .
+COPY src ./src
 
-# Expose backend port
 EXPOSE 5000
 
-# Start the backend server
-CMD ["npm", "start"]
+CMD ["pnpm", "start"]

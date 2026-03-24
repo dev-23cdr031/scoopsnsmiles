@@ -1,10 +1,18 @@
 -- ============================================================
 --  Sakthi Bakers - MySQL Seed Script
---  Run this in phpMyAdmin or via: mysql -u root < seed.sql
+--  Run this in phpMyAdmin (after selecting DB) or via:
+--    mysql -u <user> -p <database_name> < seed.sql
 -- ============================================================
 
-CREATE DATABASE IF NOT EXISTS sakthi_bakers CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE sakthi_bakers;
+-- Note:
+-- For cloud MySQL (PlanetScale, Aiven, RDS, etc.), create/select the database
+-- in the provider console first, then run this script.
+--
+-- Example cloud import (standard TCP):
+--   mysql -h <host> -P <port> -u <user> -p --ssl-mode=REQUIRED <database_name> < seed.sql
+--
+-- If your provider gives a full connection URL, use app env DATABASE_URL and
+-- import with provider SQL console or a MySQL client connected to that URL.
 
 -- -------------------- PRODUCTS ----------------------------
 CREATE TABLE IF NOT EXISTS products (
@@ -71,9 +79,9 @@ CREATE TABLE IF NOT EXISTS orders (
   order_date         VARCHAR(100) NOT NULL,
   estimated_delivery VARCHAR(100) NOT NULL,
   customer_name      VARCHAR(255) NOT NULL,
-  phone              VARCHAR(50)           DEFAULT '',
-  address            TEXT                  DEFAULT '',
-  note               TEXT                  DEFAULT ''
+  phone              VARCHAR(50),
+  address            TEXT,
+  note               TEXT
 );
 
 -- -------------------- ORDER ITEMS -------------------------
