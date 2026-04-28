@@ -1,0 +1,29 @@
+# ScoopnSmiles 🍰
+
+ScoopnSmiles is a full-stack bakery ordering platform that allows users to browse products, place orders, and track their purchases online.
+
+## Tech Stack
+
+Frontend
+- Next.js / React
+- TypeScript
+- Tailwind CSS
+
+Backend
+- Node.js
+- Express.js
+
+ML Backend
+- Python
+- Data processing scripts
+
+## Features
+
+- User authentication (Sign In / Sign Up)
+- Product browsing
+- Cart and checkout
+- Order tracking
+- Admin dashboard
+- Machine learning support for product analysis
+
+## Project Structure
