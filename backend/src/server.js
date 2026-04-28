@@ -1,3 +1,4 @@
+import "dotenv/config";
 import cors from "cors";
 import express from "express";
 import adminRoutes from "./routes/admin.js";
@@ -6,6 +7,7 @@ import engagementRoutes from "./routes/engagement.js";
 
 const app = express();
 const PORT = Number(process.env.PORT || 5000);
+const isVercel = process.env.VERCEL === "1";
 const frontendOrigin = process.env.FRONTEND_ORIGIN || "http://localhost:3000";
 
 app.use(
@@ -45,6 +47,10 @@ app.use((req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Backend API running on http://localhost:${PORT}`);
-});
+if (!isVercel) {
+  app.listen(PORT, () => {
+    console.log(`Backend API running on http://localhost:${PORT}`);
+  });
+}
+
+export default app;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -17,7 +17,7 @@ const statusSteps: { key: OrderStatus; label: string; icon: React.ReactNode }[] 
   { key: 'delivered', label: 'Delivered', icon: <CheckCircle className="w-5 h-5" /> },
 ];
 
-export default function OrderTrackingPage() {
+function OrderTrackingContent() {
   const searchParams = useSearchParams();
   const autoLoadedOrder = useRef<string | null>(null);
   const [orderId, setOrderId] = useState('');
@@ -368,5 +368,13 @@ export default function OrderTrackingPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+export default function OrderTrackingPage() {
+  return (
+    <Suspense fallback={<main className="min-h-screen bg-background" />}>
+      <OrderTrackingContent />
+    </Suspense>
   );
 }
